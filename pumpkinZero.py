@@ -6,9 +6,27 @@
 # curl https://get.pimoroni.com/blinkt | bash
 
 
-#from blinkt import set_pixel, set_brightness, show, clear
+import blinkt
 import time
 import colorsys
+
+
+
+#Function to feed the colour array into the BLINKT
+def setLED(brightness, colours):
+    #from blinkt import set_pixel, set_brightness, show, clear
+    led=0
+    
+    blinkt.clear()
+    while led<=7:
+        print("Trying to set LED " + str(led) +" to colour R - "+ str(colours[led][0]) + " G - " + str(colours[led][1]) + " B - "+ str(colours[led][2]))
+        blinkt.set_pixel(led, colours[led][0],colours[led][1],colours[led][2],brightness) #Set the colours of Blinkt!
+        led+=1 #skip to next LED
+        pass
+    blinkt.show() #activate LEDs
+
+    pass
+
 
 #Define Pallette Colours
 purple = [136,30,228]
@@ -39,9 +57,10 @@ deltaColours = [] #Calculate the deltas
 targetColours = colourCycles[currentCycle] #Initial colourCycles
 liveColours = targetColours
 
-print(targetColours)
-print(totalCycles)
+#Brightness
+brightness=0.2
 
+#Main Loop
 while True:
     #Sleep on start of loop of programme
     time.sleep(sleepSeconds)
@@ -51,20 +70,7 @@ while True:
     else:
         currentCycle +=1
 
-
-
     
-    break
-
-#Function to feed the 
-def setLED(brightness, colours):
-    led=0
-
-    #blinkt.clear()
-    while led<=7:
-        #blinkt.set_pixel(brightness, colours[0],colours[1],colours[2]) #Set the colours of Blinkt!
-        led+=1 #skip to next LED
-        pass
-    #blinkt.show() #activate LEDs
-
-    pass
+    setLED(brightness,targetColours)
+    #feed a new list of LEDs in.
+    targetColours = colourCycles[currentCycle] #Initial colourCycles
