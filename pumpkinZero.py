@@ -24,28 +24,35 @@ class LEDThread(threading.Thread):
         orange2 = [255,154,0]
         green = [133,226,31]
         pink = [255,0,128]
-        red = [200,32,14]
+        red = [255,0,0]
 
         #Define Colour Cycles to be looped through
         self.colourCycles =[
-            [purple, purple, purple, purple, green, green, green, green],
+            [purple, purple, purple, purple,purple, purple, purple, purple],
+            [red, red, red, red,red, red, red, red],
+            [green,green,green,green,green,green,green,green],
             [pink,pink,pink,pink,pink,pink,pink,pink],
+            [red, red, red, red,red, red, red, red],
+            [green,green,green,green,green,green,green,green],
             [orange1, orange2, orange1, orange2, orange1, orange2, orange1, orange2],
-            [red, red, red, red, purple, purple, purple, purple],
-            [red, red, green, green, green, green, red, red],
-            [green,orange1,green,orange1,green,orange1,green,orange1]
+            [red, red, red, red,red, red, red, red],
+            [green,green,green,green,green,green,green,green]
         ]
 
         #Timer variables
-        self.sleepSeconds = 0
-        self.transitionSeconds = 10
+        self.sleepSeconds = 5
+        self.brightness=1
+        #self.transitionSeconds = 10
 
         #Lists for keeping track of live colours being fed into the LEDs.
         self.liveColours = [] #record the live colours
         self.deltaColours = [] #Calculate the deltas
 
         #Brightness of output LEDs
-        self.brightness=0.2
+        
+#Shell script
+#python3 /home/pi/Code/pumpkinZero/pumpkinZero.py &
+#cvlc /home/pi/Code/pumpkinZero/sfx --loop --volume 200
 
     #Function to feed the colour array into the BLINKT
     def setLED(self, brightness, colours):
@@ -76,16 +83,18 @@ class LEDThread(threading.Thread):
 
         while self.running:
             
+            self.targetColours = self.colourCycles[currentCycle] #Initial colourCycles
+            #Set LEDs to current config.
+            self.setLED(self.brightness,self.targetColours)
+    
+            #Sleep on start of loop of programme
+            time.sleep(self.sleepSeconds)
+
+            #Now increment the colour cycle
             if currentCycle == totalCycles:
                 currentCycle = 0
             else:
                 currentCycle +=1
-            #Set LEDs to current config.
-            self.setLED(self.brightness,self.targetColours)
-            #feed a new list of LEDs in.
-            self.targetColours = self.colourCycles[currentCycle] #Initial colourCycles
-            #Sleep on start of loop of programme
-            time.sleep(self.sleepSeconds)
     
     def stop(self):
         self.running=False
@@ -113,7 +122,7 @@ class audioThread(threading.Thread):
         self.running=False
 
 def sigint_handler(signum, frame):
-    audio.stop()
+    #audio.stop()
     leds.stop()
 
 #handle for Ctrl C
@@ -121,7 +130,7 @@ signal.signal(signal.SIGINT, sigint_handler)
 
 
 #Set up separate threads for 
-audio = audioThread()
+#audio = audioThread()
 leds = LEDThread()
-audio.start()
+#audio.start()
 leds.start()
